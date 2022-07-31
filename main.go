@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/Olixn/Telegram-Bot-Demo/cmd"
 	"github.com/Olixn/Telegram-Bot-Demo/config"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"log"
@@ -22,7 +23,7 @@ func init() {
 func main() {
 	var bot *tgbotapi.BotAPI
 	var err error
-	fmt.Println(AppConfig.Bot.Token, AppConfig.Bot.EnableProxy)
+
 	if AppConfig.Bot.EnableProxy {
 		proxy, _ := url.Parse(AppConfig.Bot.Proxy)
 		bot, err = tgbotapi.NewBotAPIWithClient(AppConfig.Bot.Token, ApiEndPoint, &http.Client{
@@ -49,12 +50,9 @@ func main() {
 
 	for update := range updates {
 		if update.Message != nil {
-			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
-
-			msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
-			msg.ReplyToMessageID = update.Message.MessageID
-
-			bot.Send(msg)
+			log.Printf("收到新消息：[%s] %s", update.Message.From.UserName, update.Message.Text)
+			var Bot = cmd.New(bot, update)
+			Bot.Handler()
 		}
 	}
 }
